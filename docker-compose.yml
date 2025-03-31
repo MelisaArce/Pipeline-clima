@@ -1,0 +1,59 @@
+services:
+  zookeeper:
+    image: zookeeper:3.8.1
+    restart: always
+    environment:
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOO_MY_ID: 1
+    networks:
+      - kafka
+
+  kafka:
+    image: bitnami/kafka:3.4.0
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_ENABLE_KRAFT: "no"
+      KAFKA_CFG_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true" 
+    networks:
+      - kafka
+
+  kafka-ui:
+    image: docker.io/provectuslabs/kafka-ui:v0.7.2
+    restart: always
+    depends_on:
+      - kafka
+    ports:
+      - "5080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_NAME: dev
+    networks:
+      - kafka
+  topic-creator:
+    image: bitnami/kafka:3.4.0
+    depends_on:
+      - kafka
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "kafka-topics.sh --create --if-not-exists --topic weather_data --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1"
+    networks:
+      - kafka
+
+  producer:
+    build: .
+    container_name: producer
+    depends_on:
+      - kafka
+    networks:
+      - kafka
+
+networks:
+  kafka:
+    driver: bridge
