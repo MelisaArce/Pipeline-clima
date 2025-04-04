@@ -51,9 +51,68 @@ services:
     container_name: producer
     depends_on:
       - kafka
+    env_file:
+      - .env
     networks:
       - kafka
 
+  kafka-consumer-spark:
+    build:
+      context: ./consumer_to_spark
+    container_name: kafka-consumer-spark
+    depends_on:
+      - kafka
+    volumes:
+      - ${DATA_DIR}:/data
+    networks:
+      - kafka
+
+  spark-master:
+    image: bitnami/spark:3.5.0
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "${SPARK_UI_PORT}:8080"
+      - "${SPARK_WORKER_PORT}:7077"
+    volumes:
+      - "${DATA_DIR}:/data"
+    networks:
+      - kafka
+
+  spark-worker-1:
+    image: bitnami/spark:3.5.0
+    container_name: spark-worker-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=${SPARK_MASTER_URL}
+    volumes:
+      - "${DATA_DIR}:/data"
+    networks:
+      - kafka
+  spark-worker-2:
+    image: bitnami/spark:3.5.0
+    container_name: spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=${SPARK_MASTER_URL}
+    volumes:
+      - "${DATA_DIR}:/data"
+    networks:
+      - kafka
+  jupyter:
+    image: jupyter/pyspark-notebook
+    container_name: jupyter
+    ports:
+      - "${JUPYTER_PORT}:8888"
+    volumes:
+      - "${NOTEBOOK_DIR}:/home/jovyan/work"
+      - "${DATA_DIR}:/data"
+    environment:
+      - SPARK_MASTER=${SPARK_MASTER_URL}
+    networks:
+      - kafka
+      
 networks:
   kafka:
     driver: bridge

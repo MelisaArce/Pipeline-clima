@@ -2,14 +2,38 @@ import json
 import time
 import requests
 from kafka import KafkaProducer
+from dotenv import load_dotenv
+import os
 
-# Configuración de la API del clima
-APP_ID = "a45e9457"
-APP_KEY = "c043bf1310a6a0f16857fb6bb48d931a"
-KAFKA_BROKER = "kafka:9092"  # Dirección del broker en la red de Docker
-TOPIC = "weather_data"
+load_dotenv()
 
-API_URL = "http://api.weatherunlocked.com/api/current/-34.61,-58.38?app_id=a45e9457&app_key=c043bf1310a6a0f16857fb6bb48d931a"
+KAFKA_BROKER="kafka:9092"
+TOPIC="weather_data"
+
+APP_ID = os.getenv("APP_ID")
+APP_KEY = os.getenv("APP_KEY")
+LAT = os.getenv("LAT")
+LON = os.getenv("LON")
+# Validar variables requeridas
+required_vars = {
+    "APP_ID": APP_ID,
+    "APP_KEY": APP_KEY,
+    "LAT": LAT,
+    "LON": LON,
+    "KAFKA_BROKER": KAFKA_BROKER,
+    "TOPIC": TOPIC
+}
+
+missing = [var for var, value in required_vars.items() if not value]
+
+if missing:
+    print(f"❌ Faltan las siguientes variables de entorno en el archivo .env: {', '.join(missing)}")
+    print("Por favor, asegurate de que el archivo .env esté completo y correctamente cargado.")
+    exit(1)
+
+
+
+API_URL = f"http://api.weatherunlocked.com/api/current/{LAT},{LON}?app_id={APP_ID}&app_key={APP_KEY}"
 # Configurar el productor de Kafka
 producer = KafkaProducer(
     bootstrap_servers=KAFKA_BROKER,
@@ -22,6 +46,7 @@ def fetch_weather():
     try:
         print(f"Realizando solicitud a: {API_URL}")
         response = requests.get(API_URL)
+     
         
         print(f"Respuesta de la API (Código {response.status_code}): {response.text}") 
         
