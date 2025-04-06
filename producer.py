@@ -27,7 +27,7 @@ required_vars = {
 missing = [var for var, value in required_vars.items() if not value]
 
 if missing:
-    print(f"❌ Faltan las siguientes variables de entorno en el archivo .env: {', '.join(missing)}")
+    print(f"Faltan las siguientes variables de entorno en el archivo .env: {', '.join(missing)}")
     print("Por favor, asegurate de que el archivo .env esté completo y correctamente cargado.")
     exit(1)
 

@@ -56,16 +56,16 @@ services:
     networks:
       - kafka
 
-  kafka-consumer-spark:
-    build:
-      context: ./consumer_to_spark
-    container_name: kafka-consumer-spark
-    depends_on:
-      - kafka
-    volumes:
-      - ${DATA_DIR}:/data
-    networks:
-      - kafka
+  #kafka-consumer-spark:
+  #  build:
+  #    context: ./consumer_to_spark
+  #  container_name: kafka-consumer-spark
+  #  depends_on:
+  #    - kafka
+  #  volumes:
+  #    - ${DATA_DIR}:/data
+  #  networks:
+  #    - kafka
 
   spark-master:
     image: bitnami/spark:3.5.0
@@ -77,6 +77,21 @@ services:
       - "${SPARK_WORKER_PORT}:7077"
     volumes:
       - "${DATA_DIR}:/data"
+    networks:
+      - kafka
+  spark-job:
+    image: bitnami/spark:3.5.0
+    container_name: spark-job
+    depends_on:
+      - kafka
+      - spark-master
+    command: >
+      spark-submit
+      --master ${SPARK_MASTER_URL}
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0
+      /data/spark_kafka_stream.py
+    volumes:
+      - ${DATA_DIR}:/data
     networks:
       - kafka
 
@@ -107,7 +122,7 @@ services:
       - "${JUPYTER_PORT}:8888"
     volumes:
       - "${NOTEBOOK_DIR}:/home/jovyan/work"
-      - "${DATA_DIR}:/data"
+      - "${DATA_DIR}:/home/jovyan/data"
     environment:
       - SPARK_MASTER=${SPARK_MASTER_URL}
     networks:
