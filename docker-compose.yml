@@ -88,8 +88,9 @@ services:
     command: >
       spark-submit
       --master ${SPARK_MASTER_URL}
-      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.postgresql:postgresql:42.7.3
       /data/spark_kafka_stream.py
+
     volumes:
       - ${DATA_DIR}:/data
     networks:
@@ -127,6 +128,23 @@ services:
       - SPARK_MASTER=${SPARK_MASTER_URL}
     networks:
       - kafka
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: weather
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    networks:
+      - kafka
+volumes:
+  pg_data:
       
 networks:
   kafka:
