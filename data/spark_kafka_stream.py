@@ -58,7 +58,7 @@ def proceso_batch(batch_df, batch_id):
     # Guardar en PostgreSQL
     df_transformado.write \
         .format("jdbc") \
-        .option("url", "jdbc:postgresql://postgres:5432/weather") \
+        .option("url", "jdbc:postgresql://postgres-weather:5432/weather") \
         .option("dbtable", "clima") \
         .option("user", "airflow") \
         .option("password", "airflow") \

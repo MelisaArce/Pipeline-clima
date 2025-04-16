@@ -47,7 +47,8 @@ services:
       - kafka
 
   producer:
-    build: .
+    build:
+      context: ./producers
     container_name: producer
     depends_on:
       - kafka
@@ -128,9 +129,9 @@ services:
       - SPARK_MASTER=${SPARK_MASTER_URL}
     networks:
       - kafka
-  postgres:
+  postgres-weather:
     image: postgres:14
-    container_name: postgres
+    container_name: postgres-weather
     restart: always
     environment:
       POSTGRES_USER: airflow
@@ -148,4 +149,6 @@ volumes:
       
 networks:
   kafka:
-    driver: bridge
+    external: true
+    name: airflow_pipeline_net
+
