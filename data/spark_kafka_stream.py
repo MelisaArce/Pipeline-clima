@@ -2,10 +2,24 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json
 from pyspark.sql.types import StructType, StringType, FloatType, IntegerType
 from transformaciones import renombrar_columnas
+import os
 
-# Crear sesión de Spark
+
+pg_host = os.getenv("PG_HOST")
+pg_port = os.getenv("PG_PORT")
+pg_db = os.getenv("PG_DB")
+pg_user = os.getenv("PG_USER")
+pg_password = os.getenv("PG_PASSWORD")
+pg_table = os.getenv("PG_TABLE_WEATHER")
+spark_master = os.getenv("SPARK_MASTER_URL")
+kafka_broker = os.getenv("KAFKA_BROKER")
+topic = os.getenv("KAFKA_TOPIC")
+
+pg_url = f"jdbc:postgresql://{pg_host}:{pg_port}/{pg_db}"
+
+
 spark = SparkSession.builder \
-    .master("spark://spark-master:7077") \
+    .master(spark_master) \
     .appName("KafkaToSparkStreaming") \
     .getOrCreate()
 
@@ -40,8 +54,8 @@ schema = StructType() \
 # Leer el stream de Kafka
 df = spark.readStream \
     .format("kafka") \
-    .option("kafka.bootstrap.servers", "kafka:9092") \
-    .option("subscribe", "weather_data") \
+    .option("kafka.bootstrap.servers", kafka_broker) \
+    .option("subscribe", topic) \
     .option("startingOffsets", "earliest") \
     .load()
 
@@ -58,13 +72,14 @@ def proceso_batch(batch_df, batch_id):
     # Guardar en PostgreSQL
     df_transformado.write \
         .format("jdbc") \
-        .option("url", "jdbc:postgresql://postgres-weather:5432/weather") \
-        .option("dbtable", "clima") \
-        .option("user", "airflow") \
-        .option("password", "airflow") \
+        .option("url", pg_url) \
+        .option("dbtable", pg_table) \
+        .option("user", pg_user) \
+        .option("password", pg_password) \
         .option("driver", "org.postgresql.Driver") \
         .mode("append") \
         .save()
+
         
 query = weather_df.writeStream \
     .foreachBatch(proceso_batch) \

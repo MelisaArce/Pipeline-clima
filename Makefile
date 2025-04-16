@@ -37,3 +37,6 @@ up-all:
 down-all:
 	docker compose -f $(AIRFLOW_COMPOSE) down
 	docker compose -f $(STACK_COMPOSE) down
+
+postgres-db:
+	docker exec -it postgres-weather psql -U airflow-user -d weather

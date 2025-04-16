@@ -7,9 +7,8 @@ import os
 
 load_dotenv()
 
-KAFKA_BROKER="kafka:9092"
-TOPIC="weather_data"
-
+KAFKA_BROKER= os.getenv("KAFKA_BROKER")
+TOPIC= os.getenv("KAFKA_TOPIC")
 APP_ID = os.getenv("APP_ID")
 APP_KEY = os.getenv("APP_KEY")
 LAT = os.getenv("LAT")

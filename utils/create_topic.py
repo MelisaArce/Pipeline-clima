@@ -1,8 +1,17 @@
-from kafka.admin import KafkaAdminClient, NewTopic
+"""
+Script para crear el tópico 'weather_data' en Kafka.
 
+Uso futuro:
+- Puede ser llamado desde un DAG en Airflow con un PythonOperator.
+- Requiere que Kafka esté corriendo y accesible en KAFKA_BROKER.
+- Asegúrate de que el tópico no exista antes de ejecutar este script.
+"""
+
+from kafka.admin import KafkaAdminClient, NewTopic
+import os
 # Configuración del broker y tópico
-KAFKA_BROKER = "kafka:9092"
-TOPIC = "weather_data"
+KAFKA_BROKER = os.getenv("KAFKA_BROKER")
+TOPIC = os.getenv("KAFKA_TOPIC")
 
 # Crear un administrador de Kafka
 admin_client = KafkaAdminClient(
