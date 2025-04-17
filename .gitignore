@@ -1,1 +1,68 @@
 .env
+# Archivos sensibles
+.env
+.env.*
+
+# Archivos de log
+*.log
+logs/
+**/logs/
+
+# Archivos de bases de datos
+*.db
+*.sqlite
+*.sql
+*.dump
+
+# Volúmenes y montajes de Docker
+volumes/
+data/
+tmp/
+output/
+__pycache__/
+*.pyc
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de Airflow
+airflow/airflow.db
+airflow/airflow.cfg
+airflow/unittests.cfg
+airflow/logs/
+airflow/dags/__pycache__/
+airflow/plugins/__pycache__/
+airflow/.airflowenv
+
+# Archivos de Spark (si dejás algún log o temporales)
+spark-warehouse/
+metastore_db/
+*.crc
+
+# Archivos de Jupyter Notebook
+.ipynb_checkpoints/
+
+# Archivos de VSCode (si usás)
+.vscode/
+
+# Archivos generados por Docker
+**/.docker-compose.override.yml
+docker-compose.override.yml
+
+# Build de imagenes o archivos temporales
+*.tar
+*.img
+*.pid
+*.bak
+
+# Archivos relacionados con pytest u otros tests
+.cache/
+.tox/
+pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Otros
+*.swp
