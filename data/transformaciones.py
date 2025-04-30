@@ -1,0 +1,28 @@
+def renombrar_columnas(df):
+    return df.selectExpr(
+        "lat as latitud",
+        "lon as longitud",
+        "alt_m as altitud_metros",
+        "alt_f as altitud_pies",
+        "wx_desc as descripcion_clima",
+        "wx_code as codigo_clima",
+        "wx_icon as icono_clima",
+        "temp_c as temperatura_c",
+        "temp_f as temperatura_f",
+        "feelslike_c as sensacion_termica_c",
+        "feelslike_f as sensacion_termica_f",
+        "windspd_mph as viento_mph",
+        "windspd_kmh as viento_kmh",
+        "windspd_kts as viento_kts",
+        "windspd_ms as viento_ms",
+        "winddir_deg as direccion_viento_grados",
+        "winddir_compass as direccion_viento",
+        "cloudtotal_pct as nubosidad_pct",
+        "humid_pct as humedad_pct",
+        "dewpoint_c as punto_rocio_c",
+        "dewpoint_f as punto_rocio_f",
+        "vis_km as visibilidad_km",
+        "vis_mi as visibilidad_mi",
+        "slp_mb as presion_mb",
+        "slp_in as presion_in"
+    )

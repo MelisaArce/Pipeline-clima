@@ -12,10 +12,12 @@ logs/
 *.sqlite
 *.sql
 *.dump
+postgres-init/
+plugins/
 
 # Volúmenes y montajes de Docker
 volumes/
-data/
+
 tmp/
 output/
 __pycache__/
@@ -33,7 +35,7 @@ airflow/logs/
 airflow/dags/__pycache__/
 airflow/plugins/__pycache__/
 airflow/.airflowenv
-
+config/
 # Spark
 spark-warehouse/
 metastore_db/
@@ -41,6 +43,7 @@ metastore_db/
 
 # Jupyter
 .ipynb_checkpoints/
+checkpoint_postgres/
 notebooks/
 
 # VSCode
@@ -69,3 +72,4 @@ htmlcov/
 util/*.log
 util/*.tmp
 util/__pycache__/
+utils/
