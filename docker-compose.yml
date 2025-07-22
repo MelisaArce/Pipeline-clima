@@ -36,6 +36,7 @@ services:
       KAFKA_CLUSTERS_0_NAME: dev
     networks:
       - kafka
+
   topic-creator:
     image: bitnami/kafka:3.4.0
     depends_on:
@@ -49,6 +50,7 @@ services:
       --replication-factor 1
     networks:
       - kafka
+      
   producer:
     build:
       context: ./producers
@@ -128,33 +130,33 @@ services:
       - "${DATA_DIR}:/data"
     networks:
       - kafka
-  jupyter:
-    image: jupyter/pyspark-notebook
-    container_name: jupyter
-    ports:
-      - "${JUPYTER_PORT}:8888"
-    volumes:
-      - "${NOTEBOOK_DIR}:/home/jovyan/work"
-      - "${DATA_DIR}:/home/jovyan/data"
-    environment:
-      - SPARK_MASTER=${SPARK_MASTER_URL}
-    networks:
-      - kafka
-  postgres-weather:
-    image: postgres:14
-    container_name: postgres-weather
-    restart: always
-    environment:
-      POSTGRES_USER: ${PG_USER}
-      POSTGRES_PASSWORD: ${PG_PASSWORD}
-      POSTGRES_DB: ${PG_DB}
-    ports:
-      - "${PG_PORT}:5432"
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-      - ./postgres-init:/docker-entrypoint-initdb.d
-    networks:
-      - kafka
+  # jupyter:
+  #   image: jupyter/pyspark-notebook
+  #   container_name: jupyter
+  #   ports:
+  #     - "${JUPYTER_PORT}:8888"
+  #   volumes:
+  #     - "${NOTEBOOK_DIR}:/home/jovyan/work"
+  #     - "${DATA_DIR}:/home/jovyan/data"
+  #   environment:
+  #     - SPARK_MASTER=${SPARK_MASTER_URL}
+  #   networks:
+  #     - kafka
+  # postgres-weather:
+  #   image: postgres:14
+  #   container_name: postgres-weather
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: ${PG_USER}
+  #     POSTGRES_PASSWORD: ${PG_PASSWORD}
+  #     POSTGRES_DB: ${PG_DB}
+  #   ports:
+  #     - "${PG_PORT}:5432"
+  #   volumes:
+  #     - pg_data:/var/lib/postgresql/data
+  #     - ./postgres-init:/docker-entrypoint-initdb.d
+  #   networks:
+  #     - kafka
 
 volumes:
   pg_data:

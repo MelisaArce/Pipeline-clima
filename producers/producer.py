@@ -9,14 +9,10 @@ load_dotenv()
 
 KAFKA_BROKER= os.getenv("KAFKA_BROKER")
 TOPIC= os.getenv("KAFKA_TOPIC")
-APP_ID = os.getenv("APP_ID")
-APP_KEY = os.getenv("APP_KEY")
 LAT = os.getenv("LAT")
 LON = os.getenv("LON")
 # Validar variables requeridas
 required_vars = {
-    "APP_ID": APP_ID,
-    "APP_KEY": APP_KEY,
     "LAT": LAT,
     "LON": LON,
     "KAFKA_BROKER": KAFKA_BROKER,
@@ -27,12 +23,18 @@ missing = [var for var, value in required_vars.items() if not value]
 
 if missing:
     print(f"Faltan las siguientes variables de entorno en el archivo .env: {', '.join(missing)}")
-    print("Por favor, asegurate de que el archivo .env esté completo y correctamente cargado.")
     exit(1)
 
 
 
-API_URL = f"http://api.weatherunlocked.com/api/current/{LAT},{LON}?app_id={APP_ID}&app_key={APP_KEY}"
+API_URL = "https://api.open-meteo.com/v1/forecast"
+PARAMS = {
+    "latitude": LAT,
+    "longitude": LON,
+    "current_weather": True,
+    "timezone": "America/Argentina/Buenos_Aires"
+}
+
 # Configurar el productor de Kafka
 producer = KafkaProducer(
     bootstrap_servers=KAFKA_BROKER,
@@ -43,43 +45,43 @@ producer = KafkaProducer(
 
 def fetch_weather():
     try:
-        print(f"Realizando solicitud a: {API_URL}")
-        response = requests.get(API_URL)
-     
-        
-        print(f"Respuesta de la API (Código {response.status_code}): {response.text}") 
+        print(f"Realizando solicitud a Open-Meteo con params: {PARAMS}")
+        response = requests.get(API_URL, params=PARAMS)
+        print(f"Respuesta código {response.status_code}: {response.text}")
         
         if response.status_code == 200:
             data = response.json()
-            print(f"Datos completos recibidos: {data}")  
+            current = data.get("current_weather")
             
-            if not data:
-                print("La API devolvió un JSON vacío.")
+            if not current:
+                print("La API devolvió una respuesta sin 'current_weather'.")
                 return None
             
-            # Agregar timestamp y devolver toda la data
-            data["timestamp"] = time.time()
-            return data
-        
+            # Enriquecemos el mensaje
+            enriched = {
+                "timestamp": time.time(),
+                "temperature": current["temperature"],
+                "weathercode": current["weathercode"],
+                "is_day": current["is_day"],
+                "raw_time": current["time"]
+            }
+            return enriched
+
         else:
-            print(f"Error al obtener datos: {response.status_code}")
-    
+            print("Error al obtener datos.")
     except requests.exceptions.RequestException as e:
-        print(f"Error en la solicitud: {e}")
-    
+        print(f"Error de red: {e}")
     return None
 
-# Obtener datos del clima
-weather_datos = fetch_weather()
+weather_data = fetch_weather()
 
-# Enviar mensaje solo si es válido
-if weather_datos:
-    print(f"Enviando mensaje a Kafka: {weather_datos}")
+if weather_data:
+    print(f"Enviando mensaje a Kafka: {weather_data}")
     try:
-        producer.send(TOPIC, weather_datos).get(timeout=10)
+        producer.send(TOPIC, weather_data).get(timeout=10)
     except Exception as e:
         print(f"Error al enviar el mensaje: {e}")
 else:
-    print("No se enviaron datos porque la respuesta fue inválida.")
+    print("No se enviaron datos debido a error en la API.")
 
 producer.close()

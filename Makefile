@@ -10,6 +10,7 @@ help:
 	@echo "  make stack-down       - Baja el stack de Kafka, Spark y PostgreSQL"
 	@echo "  make airflow-down     - Baja los servicios de Airflow"
 	@echo "  make airflow-logs     - Muestra logs de Airflow Webserver"
+	@echo "  make build-airflow    - Construye la imagen custom de Airflow"
 	@echo "  make up-all           - Levanta todos los servicios (Airflow y stack)"
 	@echo "  make down-all         - Baja todos los servicios (Airflow y stack)"
 	@echo "  make postgres-client  - Accede al cliente de PostgreSQL"
@@ -65,3 +66,9 @@ down-all:
 # ================================
 postgres-client:
 	docker exec -it postgres-weather psql -U airflow-user -d weather
+
+# ================================
+# Build personalizado de Airflow
+# ================================
+build-airflow:
+	docker build -t custom-airflow:latest .
