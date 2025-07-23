@@ -23,7 +23,9 @@ x-airflow-common:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./plugins:/opt/airflow/plugins
-  user: "${AIRFLOW_UID}:0"
+    - /var/run/docker.sock:/var/run/docker.sock 
+  user: "${AIRFLOW_UID}:${AIRFLOW_GID}"
+
   depends_on:
     &airflow-common-depends-on
     redis:
