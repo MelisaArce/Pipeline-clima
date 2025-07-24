@@ -51,16 +51,18 @@ services:
     networks:
       - kafka
       
-  producer:
-    build:
-      context: ./producers
-    container_name: producer
-    depends_on:
-      - kafka
-    env_file:
-      - .env
-    networks:
-      - kafka
+  # producer:
+  #   image: melisaarce/weather-producer:latest 
+  #   container_name: producer
+  #   depends_on:
+  #     - kafka
+  #   environment:
+  #     LAT: "-34.6037"
+  #     LON: "-58.3816"
+  #     KAFKA_BROKER: "kafka:29092" 
+  #     TOPIC: "weather_data"
+  #   networks:
+  #     - kafka
 
   #kafka-consumer-spark:
   #  build:

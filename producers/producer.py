@@ -2,15 +2,13 @@ import json
 import time
 import requests
 from kafka import KafkaProducer
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
 KAFKA_BROKER= os.getenv("KAFKA_BROKER")
-TOPIC= os.getenv("KAFKA_TOPIC")
+TOPIC= os.getenv("TOPIC") 
 LAT = os.getenv("LAT")
 LON = os.getenv("LON")
+
 # Validar variables requeridas
 required_vars = {
     "LAT": LAT,
@@ -18,29 +16,19 @@ required_vars = {
     "KAFKA_BROKER": KAFKA_BROKER,
     "TOPIC": TOPIC
 }
-
-missing = [var for var, value in required_vars.items() if not value]
-
-if missing:
-    print(f"Faltan las siguientes variables de entorno en el archivo .env: {', '.join(missing)}")
-    exit(1)
-
-
-
 API_URL = "https://api.open-meteo.com/v1/forecast"
+
 PARAMS = {
     "latitude": LAT,
     "longitude": LON,
     "current_weather": True,
     "timezone": "America/Argentina/Buenos_Aires"
 }
-
-# Configurar el productor de Kafka
+# Configurar el productor de Kafk
 producer = KafkaProducer(
     bootstrap_servers=KAFKA_BROKER,
     value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-    api_version=(3,4,0)
-    
+    api_version=(3,4,0)   
 )
 
 def fetch_weather():

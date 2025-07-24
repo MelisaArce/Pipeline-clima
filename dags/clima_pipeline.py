@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.operators.docker_operator import DockerOperator
+from airflow.providers.docker.operators.docker import DockerOperator
 from datetime import datetime, timedelta
 
 default_args = {
@@ -19,13 +19,19 @@ with DAG(
 ) as dag:
 
     run_producer = DockerOperator(
-        task_id='run_weather_producer',
-        image='clima_stack-producer',  # Asegurate que así se llama la imagen
-        container_name='producer_from_airflow',
-        api_version='auto',
-        auto_remove=True,
-        docker_url='unix://var/run/docker.sock',
-        network_mode='airflow_pipeline_net',  # o el que uses (puede ser tu red de Kafka si es custom)
-    )
-
-    run_producer
+    task_id='run_weather_producer',
+    image='melisaarce/weather-producer:latest',
+    container_name='producer_intento99',
+    api_version='auto',
+    auto_remove=True,
+    docker_url='unix://var/run/docker.sock',
+    network_mode='airflow_pipeline_net',
+    mount_tmp_dir=False,
+    command="python /app/producer.py",
+    environment={
+        "LAT": "-34.6037",
+        "LON": "-58.3816",
+        "KAFKA_BROKER": "kafka:9092",
+        "TOPIC": "weather_data"
+    }
+)
