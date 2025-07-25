@@ -50,19 +50,6 @@ services:
       --replication-factor 1
     networks:
       - kafka
-      
-  # producer:
-  #   image: melisaarce/weather-producer:latest 
-  #   container_name: producer
-  #   depends_on:
-  #     - kafka
-  #   environment:
-  #     LAT: "-34.6037"
-  #     LON: "-58.3816"
-  #     KAFKA_BROKER: "kafka:29092" 
-  #     TOPIC: "weather_data"
-  #   networks:
-  #     - kafka
 
   #kafka-consumer-spark:
   #  build:
@@ -100,6 +87,8 @@ services:
       /data/spark_kafka_stream.py
     volumes:
       - ${DATA_DIR}:/data
+      - ./data/output:/data/output
+      - ./data/checkpoint:/data/checkpoint
     environment:
       # - PG_HOST=${PG_HOST}
       # - PG_PORT=${PG_PORT}
@@ -132,33 +121,6 @@ services:
       - "${DATA_DIR}:/data"
     networks:
       - kafka
-  # jupyter:
-  #   image: jupyter/pyspark-notebook
-  #   container_name: jupyter
-  #   ports:
-  #     - "${JUPYTER_PORT}:8888"
-  #   volumes:
-  #     - "${NOTEBOOK_DIR}:/home/jovyan/work"
-  #     - "${DATA_DIR}:/home/jovyan/data"
-  #   environment:
-  #     - SPARK_MASTER=${SPARK_MASTER_URL}
-  #   networks:
-  #     - kafka
-  # postgres-weather:
-  #   image: postgres:14
-  #   container_name: postgres-weather
-  #   restart: always
-  #   environment:
-  #     POSTGRES_USER: ${PG_USER}
-  #     POSTGRES_PASSWORD: ${PG_PASSWORD}
-  #     POSTGRES_DB: ${PG_DB}
-  #   ports:
-  #     - "${PG_PORT}:5432"
-  #   volumes:
-  #     - pg_data:/var/lib/postgresql/data
-  #     - ./postgres-init:/docker-entrypoint-initdb.d
-  #   networks:
-  #     - kafka
 
 # volumes:
 #   pg_data:
@@ -167,7 +129,3 @@ networks:
   kafka:
     external: true
     name: airflow_pipeline_net
-
-#networks:
-#  airflow_pipeline_net:
- #   driver: bridge
