@@ -14,7 +14,7 @@ logs/
 *.dump
 postgres-init/
 plugins/
-
+checkpoint/
 # Volúmenes y montajes de Docker
 volumes/
 

@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
 from datetime import datetime, timedelta
+#from airflow.timetables import CronTrigger
 
 default_args = {
     'owner': 'melisa',
@@ -14,7 +15,7 @@ with DAG(
     dag_id='producer_weather_dag',
     default_args=default_args,
     description='Ejecuta el producer de clima 2 veces al día',
-    schedule_interval='0 8,20 * * *',  # 08:00 y 20:00
+    #schedule=CronTrigger('0 8,20 * * *', timezone='UTC'), # Usa 'schedule=' en vez de 'schedule_interval='
     catchup=False,
 ) as dag:
 
@@ -23,7 +24,7 @@ with DAG(
     image='melisaarce/weather-producer:latest',
     container_name='producer_intento99',
     api_version='auto',
-    auto_remove=True,
+    auto_remove='success',
     docker_url='unix://var/run/docker.sock',
     network_mode='airflow_pipeline_net',
     mount_tmp_dir=False,
