@@ -1,0 +1,4 @@
+apache-airflow-providers-docker
+apache-airflow-providers-apache-spark
+docker
+kafka-python
